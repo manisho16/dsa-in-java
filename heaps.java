@@ -145,7 +145,7 @@ public class heaps {
         /*for addition 
         we add the element at the last element and then fic the heap
         */
-        ArrayList<point> arr=new ArrayList<>();
+        // ArrayList<point> arr=new ArrayList<>();
         // arr.add(1);
         // arr.add(6);
         // arr.add(8);
