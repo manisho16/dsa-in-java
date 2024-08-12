@@ -158,12 +158,36 @@ public class trie{
         return res+1;
     }
 
+    //making a statuc string to store the result
+    public static String res="";
+
+    public static void longest(node root, StringBuilder temp){
+        if(root==null){
+            return;
+        }
+        //for the given node i check its child array to find the node which is not null and is an end of word
+        //if the condition is satisfied then i add the characte in the temp string
+        //and call the largest function again for this child node as the root
+        //unitll i find the actual end of word character
+        for(int i=0;i<26;i++){
+            if(root.child[i]!=null && root.child[i].eow==true){
+                temp.append((char)(i+'a'));//adding the characte in the temp string
+                //i compare the length of reult and temp and finalize the max on
+                if(temp.length()>res.length()){
+                    res=temp.toString();//as temp is a string builder
+                }
+                longest(root.child[i],temp);
+                //if the chain comes back then i remove the last character from the temp
+                temp.deleteCharAt(temp.length()-1);
+            }
+        }
+    }
     public static void main(String args[]){
-        // String dict[]={"i","am","a","recommended","person","chap","not"};
+        String dict[]={"recommended","c","ch","cha","chap","not"};
         
-        // for(int i=0;i<dict.length;i++){
-        //     insert(dict[i]);
-        // }
+        for(int i=0;i<dict.length;i++){
+            insert(dict[i]);
+        }
 
         // for(int i=0;i<dict.length;i++){
         //     System.out.print(dict[i]+" "+valid(dict[i]));
@@ -182,17 +206,24 @@ public class trie{
             // System.out.println("key status "+ starts(key));
         
         //unique substring
-            String key="ababa";
-            //for this problem 
-            //1. we find out all the suffixexs of the given key
-            //2. we store them within a trie ds as it stores all the unique prefexes of a given word
-            //thus it is also called prefix tree
-            //3. then we find out all the nodes in the teir, to get the no of unique substrings
-            for(int i=0;i<key.length();i++){
-                insert(key.substring(i));
-                //inserting all the suffixes in the tier
-            }
-            //calling a count function to give us the no of nodes in the tier
-            System.out.println(count(root));
+            // String key="ababa";
+            // //for this problem 
+            // //1. we find out all the suffixexs of the given key
+            // //2. we store them within a trie ds as it stores all the unique prefexes of a given word
+            // //thus it is also called prefix tree
+            // //3. then we find out all the nodes in the teir, to get the no of unique substrings
+            // for(int i=0;i<key.length();i++){
+            //     insert(key.substring(i));
+            //     //inserting all the suffixes in the tier
+            // }
+            // //calling a count function to give us the no of nodes in the tier
+            // System.out.println(count(root));
+
+        //longest word with all prefexes
+        //we add all the word of the given array in the tier 
+        //and then we find out the node where each array elemetn is an oend of word
+        //as in tier if we have every prefix and the word in the array then they all will be with in a single node chain
+            // longest(root, new StringBuilder(""));
+            // System.out.println(res);
     }
 }
