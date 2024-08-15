@@ -158,7 +158,7 @@ public class trie{
         return res+1;
     }
 
-    //making a statuc string to store the result
+    //making a static string to store the result
     public static String res="";
 
     public static void longest(node root, StringBuilder temp){
