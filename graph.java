@@ -58,14 +58,19 @@ public class graph {
 
         // now we add data of different edges
         // here we add the neighbouring edges og the current node
+            
+        //tarjan
+            //undirected graph
         graph[0].add(new edge(0,1));
+        graph[0].add(new edge(0,2));
         graph[0].add(new edge(0,3));
         graph[1].add(new edge(1, 2));
-        graph[1].add(new edge(1, 3));
+        graph[1].add(new edge(1, 0));
         graph[2].add(new edge(2, 0));
+        graph[2].add(new edge(2, 1));
         graph[3].add(new edge(3, 4));
-        graph[4].add(new edge(4, 5));
-        // graph[5].add(new edge(5, 0));
+        graph[3].add(new edge(3, 0));
+        graph[4].add(new edge(4, 3));
 
             //dij
         // graph[0].add(new edge(0,1,2));
@@ -567,11 +572,116 @@ public class graph {
         }
     }
 
+    public static void dfs_tarjan(ArrayList<edge>[] graph,int discT[], int lowT[],boolean visited[],int time,int curr, int parent){
+        //here in this dfs, i make the current node visited
+        //store the discT, lowT as the current time and later i update the low t
+        visited[curr]=true;
+        discT[curr]=lowT[curr]=++time;
+
+        //now in the dfs i have 3 conditions
+        // 1-> if i have the parent as the neightbour --> i ignore
+        // 2-> if neighbour is not visited --> i call dfs for the neighbour
+        //      and update low[curr]=min(low[curr],low[neighbour]) and check the tarjan condition
+        // 3-> if neighbour is visited --> i update low[curr]=min(low[curr],discT[neighbour]) 
+
+        for(int i=0;i<graph[curr].size();i++){
+            edge e=graph[curr].get(i);
+            int neigh=e.dest;
+            if(neigh==parent){continue;}
+            else if(!visited[neigh]){
+                dfs_tarjan(graph, discT, lowT, visited, time, neigh, curr);
+                lowT[curr]=Math.min(lowT[curr],lowT[neigh]);
+                if(discT[curr]<lowT[neigh]){
+                    System.out.println("found bridge b/w "+curr+" and "+neigh);
+                }
+            }else{
+                lowT[curr]=Math.min(lowT[curr],discT[neigh]);
+            }
+        }
+    }
+
+    public static void tarjan(ArrayList<edge>[] graph, int v){
+        //here i initialised the arrays
+        //visited->a boolena array to check if a node is visited or not
+        //disT->for discovery time, which is -1 for initial parent
+        //lowT->for the lowest time
+        //time->integer to store time and increament it every time i move a node
+        int discT[]= new int[v];
+        int lowT[]= new int[v];
+        int time=0;
+        boolean visited[]=new boolean[v];
+
+        //now for every node which is not visited i call customised dfs for it
+        for(int i=0;i<v;i++){
+            if(!visited[i]){
+                dfs_tarjan(graph,discT,lowT,visited,time,i,-1);
+            }
+        }
+
+    }
+   
+    public static void dfs_arti(ArrayList<edge>[] graph,int discT[], int lowT[],boolean visited[],int time,int curr, int parent){
+        //here in this dfs, i make the current node visited
+        //store the discT, lowT as the current time and later i update the low t
+        //i make a child integer to store the no of children node for current node
+        visited[curr]=true;
+        discT[curr]=lowT[curr]=++time;
+        int children=0;
+
+        //now in the dfs i have 4 conditions depending upon the curent node and its childs
+        // 1-> if the neighbobur is parent -- ignore
+        // 2-> if neighbour is not visited i check for bridge -- call dfs for the neighbour and update the low with lowest of low[curr],low[neighbour]
+        //      and check the condition for bridge while my parent is not -1
+        //      here i also increase the child count of current node
+        // 3-> for checking the root of loop, if the neighbour is visited -- i update the current low, with lowest of low[curr], ds[neighbour]
+        // 4-> if parent is -1 and i have more than one child -- it is an articulation point
+
+
+        for(int i=0;i<graph[curr].size();i++){
+            edge e=graph[curr].get(i);
+            int neigh=e.dest;
+            if(neigh==parent){continue;}
+            else if(!visited[neigh]){
+                dfs_arti(graph, discT, lowT, visited, time, neigh, curr);
+                lowT[curr]=Math.min(lowT[curr],lowT[neigh]);
+                if(parent !=-1 && discT[curr]<lowT[neigh]){
+                    System.out.println("the articulation node is "+curr);
+                }
+                children++;
+            }else{
+                lowT[curr]=Math.min(lowT[curr],discT[neigh]);
+            }
+        }
+        if(parent == -1 && children>1){
+            System.out.println("the articulation node is "+curr);
+        }
+    }
+
+    public static void articulation(ArrayList<edge>[] graph, int v){
+        //here i initialised the arrays
+        //visited->a boolena array to check if a node is visited or not
+        //disT->for discovery time, which is -1 for initial parent
+        //lowT->for the lowest time
+        //time->integer to store time and increament it every time i move a node
+        int discT[]= new int[v];
+        int lowT[]= new int[v];
+        int time=0;
+        boolean visited[]=new boolean[v];
+
+        //now for every node which is not visited i call customised dfs for it
+        for(int i=0;i<v;i++){
+            if(!visited[i]){
+                dfs_arti(graph,discT,lowT,visited,time,i,-1);
+            }
+        }
+
+    }
+
     @SuppressWarnings("unchecked")
     public static void main(String args[]) {
         // making an array to store arraylists within it that stores edges info
         //grpah is made using array of arraylist
-            int v = 6 ;// to store the no of vertices
+            int v = 5 ;// to store the no of vertices
             ArrayList<edge>[] graph = new ArrayList[v];
         // here we could add any no of vertices
             build(graph);
@@ -704,6 +814,35 @@ public class graph {
         //  1-> we do topologival sorting and make a stack
         //  2-> we make a new transpose grpah of the orignal graph // changing the directions of edges src and dest
         //  3-> we do the dfs on the transpose graph 
-        kosaraju(graph,v);
+            // kosaraju(graph,v);
+
+            //bridges // targans algorithm
+        //in this i find that edge , by removing which i am able to making more subgraphs
+        //here i use tarjans algorithm 
+        //which i fully based upon the discovery time of a node
+        //we make 2 arrays, discovery time- to store the discovery time of current node
+        //low -> to store the lowest discovery time of the current node and its neighbours
+        //by this we use dfs and say an edge  as a bridge if for the edge b/w 'u' and 'v' node
+        //disctime[u] < lowtime[v]
+        //as we conclude that their is no backedge b/w those edges and it is the only edge joining those nodes
+            // tarjan(graph,v);
+
+            //articulation point
+        //this is same as bridge but here instead of edge i found the node
+        //removing which i can get seperate connect graph
+        //here for a current we check its child
+        // 1-> if current has one child --> not articulation point
+        //if it has 2 child the --> if childs are unconnected then its an articulation point
+
+        // 2-> if current node edge with neighbour is the bridge --> articulation point
+        //      discT[curr]<lowT[neigh]
+        // 3-> if current node is the root of a cycyle --> articulation point
+        //      lowT[neigh]==discT[curr]
+        //and outside the loop i check
+            // articulation(graph, v);
+
+
+
+
     }
 }
